@@ -12,4 +12,5 @@ How To Run
 
 Note
 I recomend downloading some sort of IDE. I use VSCode - https://code.visualstudio.com/download
+
 If you change the name of the main file, in this case index.js, then you need to adjust the command to be 'node updatedFileName.js' to start it
