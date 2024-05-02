@@ -56,7 +56,7 @@ async function handleCommand(client, commandName, args) {
 }
 
 // Constants for bot configuration
-const botName = 'SC09-test'; // Replace with your bot's name
+const botName = 'Bot'; // Replace with your bot's name
 const serverIp = 'kaboom.pw'; // Replace with your server's IP address
 const serverPort = 25565; // Replace with your server's port
 const prefix = '!'; // Command prefix used to identify bot commands
