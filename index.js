@@ -29,7 +29,6 @@ function generateRandomCode(length) {
 async function handleCommand(client, commandName, args) {
     // Check for different commands
     switch (commandName) {
-        // Command to perform self-care actions in Minecraft
         case 'countdown':
             // Check if no arguments are provided
             if (args.length == 0) {
