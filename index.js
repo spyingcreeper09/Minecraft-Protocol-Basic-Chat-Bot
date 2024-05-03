@@ -1,6 +1,13 @@
 // Import the minecraft-protocol library
 const mc = require('minecraft-protocol');
 
+// Global variables
+let hash;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 // Function to generate a random alphanumeric code of a specified length
 function generateRandomCode(length) {
     // Define all possible characters for the code
@@ -23,18 +30,20 @@ async function handleCommand(client, commandName, args) {
     // Check for different commands
     switch (commandName) {
         // Command to perform self-care actions in Minecraft
-        case 'selfcare':
+        case 'countdown':
             // Check if no arguments are provided
             if (args.length == 0) {
-                // Perform self-care actions: make player an operator and switch to creative mode
-                client.chat('/op @s[type=player]');
+                // count down from 3
+                client.chat('3');
                 await sleep(200); // Delay to prevent rapid chat commands
-                client.chat('/gmc');
+                client.chat('2');
                 await sleep(200); // Delay in milliseconds
-                client.chat('Selfcare Complete');
+                client.chat('1');
+                await sleep(200);
+                client.chat('Countdown complete');
             } else {
                 // Inform user of incorrect command usage
-                client.chat('Invalid arguments for selfcare command. Usage: !selfcare');
+                client.chat('Invalid arguments for countdown command. Usage: !countdown');
             }
             break;
         // Command to echo a message in Minecraft chat
@@ -48,7 +57,15 @@ async function handleCommand(client, commandName, args) {
                 client.chat('Invalid arguments for echo command. Usage: !echo <phrase to echo>');
             }
             break;
-        // Add more cases for other commands here
+        case 'validate':
+            if (hash == args.pop()){
+                client.chat('Valid hash');
+                hash = generateRandomCode(8);
+                console.log(`Hash: ${hash}`);
+            } else {
+                client.chat('Invalid hash');
+            }
+            break;
         default:
             // Log unknown commands to console
             client.chat(`Unknown command: ${commandName}`);
@@ -57,7 +74,7 @@ async function handleCommand(client, commandName, args) {
 
 // Constants for bot configuration
 const botName = 'Bot'; // Replace with your bot's name
-const serverIp = 'kaboom.pw'; // Replace with your server's IP address
+const serverIp = 'Server.IP'; // Replace with your server's IP address
 const serverPort = 25565; // Replace with your server's port
 const prefix = '!'; // Command prefix used to identify bot commands
 
@@ -76,7 +93,7 @@ client.on('login', () => {
     console.log(`${botName} connected to ${serverIp}:${serverPort}`);
 
     // Generate a hash for the owner to use
-    let hash = generateRandomCode(8); // The number is how long the code is
+    hash = generateRandomCode(8); // The number is how long the code is
     console.log(`Hash: ${hash}`);
 
     // Event listener for incoming player chat messages
@@ -90,20 +107,8 @@ client.on('login', () => {
             const words = cleanMessage.trim().split(/\s+/);
             const commandName = words.shift();
             const args = words;
-            // Get the hash from the message
-            const inputHash = args.pop();
-
-            // Check if the hash matches
-            if (inputHash == hash) {
-                // Generate a new hash
-                hash = generateRandomCode(8);
-                console.log(`Hash: ${hash}`);
-                // Call command handler with extracted command name and arguments
-                handleCommand(client, commandName, args);
-            } else {
-                // Reject and don't do anything if hash is invalid
-                client.chat('Invalid Hash');
-            }
+            // Call command handler with extracted command name and arguments
+            handleCommand(client, commandName, args);
         }
     });
 });
