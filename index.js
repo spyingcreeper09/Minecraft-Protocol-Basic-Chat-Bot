@@ -96,7 +96,7 @@ function onSpawn() {
                     // Generate a new hash
                     hash = generateRandomCode(8);
                     console.log(`Hash: ${hash}`);
-                    console.log("[Debug] Command: " + commandName + " " + args)
+                    console.log(`[Debug] \nCommand: ${commandName}\nArguments: ${args.join(" ")}`)
                     // Call command handler with extracted command name and arguments
                     handleCommand(client, commandName, args);
                 } else {
