@@ -66,9 +66,9 @@ async function handleCommand(client, commandName, args) {
             if (args.length == 0) {
                 // Perform self-care actions: make player an operator and switch to creative mode
                 client.chat('/op @s[type=player]');
-                await sleep(200); // Delay to prevent rapid chat commands
+                await sleep(200); // Delay to prevent rapid chat commands in miliseconds
                 client.chat('/gmc');
-                await sleep(200); // Delay in milliseconds
+                await sleep(200); // Delay to prevent rapid chat commands in milliseconds
                 client.chat('Selfcare Complete');
             } else {
                 // Inform user of incorrect command usage
