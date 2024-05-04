@@ -1,5 +1,5 @@
 // Import the minecraft-protocol library
-const mc = require('minecraft-protocol');
+const mc = require('mineflayer');
 
 // Function to generate a random alphanumeric code of a specified length
 function generateRandomCode(length) {
@@ -51,18 +51,18 @@ async function handleCommand(client, commandName, args) {
         // Add more cases for other commands here
         default:
             // Log unknown commands to console
-            client.chat(`Unknown command: ${commandName}`);
+            client.chat(`${commandName} isn't a command :()`);
     }
 }
 
 // Constants for bot configuration
 const botName = 'Bot'; // Replace with your bot's name
-const serverIp = 'kaboom.pw'; // Replace with your server's IP address
-const serverPort = 25565; // Replace with your server's port
+const serverIp = '127.0.0.1'; // Replace with your server's IP address
+const serverPort = 39753; // Replace with your server's port
 const prefix = '!'; // Command prefix used to identify bot commands
 
 // Create Minecraft client object
-const client = mc.createClient({
+const client = mc.createBot({
     host: serverIp,
     port: serverPort,
     version: false,
@@ -70,40 +70,46 @@ const client = mc.createClient({
     checkTimeoutInterval: 690 * 1000 // Set timeout interval for connection checks
 });
 
-// Event listener for successful login
-client.on('login', () => {
+function onSpawn() {
     // Log successful connection to the server
-    console.log(`${botName} connected to ${serverIp}:${serverPort}`);
-
+    console.log(`${botName} successfully connected to the server ${serverIp}:${serverPort}`)
     // Generate a hash for the owner to use
     let hash = generateRandomCode(8); // The number is how long the code is
+    // Now tell the user what his/her hash is
     console.log(`Hash: ${hash}`);
-
-    // Event listener for incoming player chat messages
-    client.on('player_chat', (packet) => {
-        // Extract plain message from packet
-        const message = packet.plainMessage;
+    client.on("chat", async (name, message) => {
+        if (name == botName) return
+        console.log(name + ": " + message)
         // Check if message starts with command prefix
         if (message.charAt(0) == prefix) {
             // Extract command name and arguments from the message
-            const cleanMessage = message.slice(1);
-            const words = cleanMessage.trim().split(/\s+/);
-            const commandName = words.shift();
+            const words = message.trim().split(/\s+/);
+            const command = words.shift();
+            const commandName = command.replace("!", "");
             const args = words;
             // Get the hash from the message
             const inputHash = args.pop();
-
-            // Check if the hash matches
-            if (inputHash == hash) {
-                // Generate a new hash
-                hash = generateRandomCode(8);
-                console.log(`Hash: ${hash}`);
-                // Call command handler with extracted command name and arguments
-                handleCommand(client, commandName, args);
-            } else {
-                // Reject and don't do anything if hash is invalid
-                client.chat('Invalid Hash');
+            console.log("[Debug] Input: " + inputHash)
+            try {
+                // Check if the hash matches
+                if (inputHash == hash) {
+                    // Generate a new hash
+                    hash = generateRandomCode(8);
+                    console.log(`Hash: ${hash}`);
+                    console.log("[Debug] Command: " + commandName + " " + args)
+                    // Call command handler with extracted command name and arguments
+                    handleCommand(client, commandName, args);
+                } else {
+                    // Reject and don't do anything if hash is invalid
+                    client.chat('Invalid hash :(');
+                }
+            }
+            catch (err) {
+                client.chat("Unable to reach hash variable")
             }
         }
     });
-});
+}
+
+// Event listener for successful login
+client.once('spawn', onSpawn);
