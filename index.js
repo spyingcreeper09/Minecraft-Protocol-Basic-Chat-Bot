@@ -57,8 +57,8 @@ async function handleCommand(client, commandName, args) {
 
 // Constants for bot configuration
 const botName = 'Bot'; // Replace with your bot's name
-const serverIp = '127.0.0.1'; // Replace with your server's IP address
-const serverPort = 39753; // Replace with your server's port
+const serverIp = 'kaboom.pw'; // Replace with your server's IP address
+const serverPort = 25565; // Replace with your server's port
 const prefix = '!'; // Command prefix used to identify bot commands
 
 // Create Minecraft client object
