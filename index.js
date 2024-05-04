@@ -60,6 +60,22 @@ function onSpawn() {
 async function handleCommand(client, commandName, args) {
     // Check for different commands
     switch (commandName) {
+        case 'countdown':
+            // Check if no arguments are provided
+            if (args.length == 0) {
+                // count down from 3
+                client.chat('3');
+                await sleep(200); // Delay to prevent rapid chat commands
+                client.chat('2');
+                await sleep(200); // Delay in milliseconds
+                client.chat('1');
+                await sleep(200);
+                client.chat('Countdown complete');
+            } else {
+                // Inform user of incorrect command usage
+                client.chat('Invalid arguments for countdown command. Usage: !countdown');
+            }
+            break;
         // Command to perform self-care actions in Minecraft
         case 'selfcare':
             // Check if no arguments are provided
@@ -75,6 +91,17 @@ async function handleCommand(client, commandName, args) {
                 client.chat('Invalid arguments for selfcare command. Usage: !selfcare');
             }
             break;
+        // Validate your hash
+        case 'validate':
+            if (hash == args.pop()){
+                client.chat('Valid hash');
+                hash = generateRandomCode(8);
+                console.log(`Hash: ${hash}`);
+            } else {
+                client.chat('Invalid hash');
+            }
+            break;
+        
         // Command to echo a message in Minecraft chat
         case 'echo':
             // Check if arguments are provided
