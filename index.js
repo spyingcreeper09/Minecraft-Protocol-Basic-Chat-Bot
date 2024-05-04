@@ -25,7 +25,7 @@ function onSpawn() {
     console.log(`Hash: ${hash}`);
     client.on("chat", async (name, message) => {
         if (name == botName) return
-        console.log(name + ": " + message)
+        console.log(`[Chat] ${name}: ${message}`)
         // Check if message starts with command prefix
         if (message.charAt(0) == prefix) {
             // Extract command name and arguments from the message
