@@ -1,9 +1,3 @@
-Credit
-
-I have to give most of the credit to [SonicandTailsCD](https://github.com/SonicandTailsCD). this was ment to jusy be a single time thing where i upload thos for people on [Kaboom](kaboom.pw) to use but SonicandTailsCD has done his best to make this project easy and ready to use. Big thanks to him. I might not update this too often so the most up to date version would most likely be on here: https://github.com/SonicandTailsCD/Minecraft-Protocol-Basic-Chat-Bot
-
-This is meant to be a very basic minecraft chat bot verification system with hardcoded commands for beginners. Go ahead and do what you want with it.
-
 How To Run
 1. Install Node.js - https://nodejs.org/en/download
 2. Download this repository (or clone with `git clone https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot.git`)
