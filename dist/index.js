@@ -67,6 +67,8 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
         console.trace(`The command returned undefined. Tracing now:`);
         return hash;
     }
+    console.log(`[Debug] Command: ${commandName}`);
+    console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`);
     if (commandName in publicCommands) {
         console.log(`Public command used: ${commandName}`);
         switch (commandName) {
@@ -97,10 +99,7 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
         }
         return hash;
     }
-    else
-        console.log(`[Debug] Command: `);
-    console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`);
-    if (inputHash === hash) {
+    else if (inputHash === hash) {
         console.log(`[Debug] Command used: ${commandName}`);
         switch (commandName) {
             case 'selfcare':
@@ -145,9 +144,15 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
         console.log(`New hash: ${newhash}`);
         return newhash;
     }
-    console.warn("Commands aren't working...");
-    bot.chat("Trouble reading commands :(");
-    return hash;
+    else if (inputHash != hash) {
+        bot.chat("Invalid hash! :(");
+        return hash;
+    }
+    else {
+        console.warn("Commands aren't working...");
+        bot.chat("Trouble reading commands :(");
+        return hash;
+    }
 }
 async function botFollowPlayer(username, range) {
     botStates.following = true;

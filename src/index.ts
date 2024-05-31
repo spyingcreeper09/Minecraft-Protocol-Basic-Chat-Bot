@@ -94,6 +94,8 @@ async function handleCommand(username: string, commandName: string, args: any, i
         console.trace(`The command returned undefined. Tracing now:`)
         return hash;
     }
+    console.log(`[Debug] Command: ${commandName}`)
+    console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`)
     if (commandName in publicCommands) {
         console.log(`Public command used: ${commandName}`)
         switch (commandName) {
@@ -126,9 +128,7 @@ async function handleCommand(username: string, commandName: string, args: any, i
         }
         return hash;
     }
-    else console.log(`[Debug] Command: `)
-    console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`)
-    if (inputHash === hash) {
+    else if (inputHash === hash) {
         console.log(`[Debug] Command used: ${commandName}`)
         // Check for different commands
         switch (commandName) {
@@ -182,9 +182,15 @@ async function handleCommand(username: string, commandName: string, args: any, i
         console.log(`New hash: ${newhash}`)
         return newhash;
     }
-    console.warn("Commands aren't working...")
-    bot.chat("Trouble reading commands :(")
-    return hash
+    else if (inputHash != hash) {
+        bot.chat("Invalid hash! :(")
+        return hash
+    }
+    else {
+        console.warn("Commands aren't working...")
+        bot.chat("Trouble reading commands :(")
+        return hash
+    }
 }
 
 // Don't modify this function please!
@@ -213,7 +219,8 @@ async function botFollowPlayer(username: string, range: number) {
             await sleep(200);
             const goal = new goals.GoalFollow(player.entity, range);
             await bot.pathfinder.goto(goal);
-        } catch (err) {
+        }
+        catch (err) {
             console.log(String(err?.message));
             bot.chat('Sorry, I\'ve ran into an error. I can\'t keep following you. Please run that command again :)');
             return;
