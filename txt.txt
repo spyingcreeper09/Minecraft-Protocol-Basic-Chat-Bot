@@ -1,0 +1,12 @@
+Robot successfully connected to the server 127.0.0.1:41427
+Hash: EbnO6sEo
+[Chat] SonicandTailsCD: !echo Hi! I'm working now :) EbnO6sEo
+[Debug] newHash(...) called with input EbnO6sEo and hash EbnO6sEo
+New hash: y5BodGKX
+[Chat] SonicandTailsCD: !echo Hi! I'm working now :) EbnO6sEo
+[Debug] newHash(...) called with input EbnO6sEo and hash EbnO6sEo
+New hash: z4RJ11ns
+[Chat] SonicandTailsCD: !echo Hi! I'm working now :) z4RJ11ns
+[Debug] newHash(...) called with input z4RJ11ns and hash EbnO6sEo
+[Chat] Robot: Invalid hash :(
+[Chat] Robot: Hi! I'm working now :)
