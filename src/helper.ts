@@ -8,5 +8,6 @@ export async function sleep(ms: number) {
 }
 export const botStates = {
     following: false,
-    looking: false
+    looking: false,
+    moving: false
 }

@@ -7,5 +7,6 @@ export async function sleep(ms) {
 }
 export const botStates = {
     following: false,
-    looking: false
+    looking: false,
+    moving: false
 };

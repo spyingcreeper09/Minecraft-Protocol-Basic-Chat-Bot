@@ -146,7 +146,19 @@ async function handleCommand(username: string, commandName: string, args: any, i
                     // Inform user of incorrect command usage
                     bot.chat('Invalid arguments for selfcare command. Usage: !selfcare');
                 }
-                break;        
+                break;  
+            case 'stop':
+                if (args.length = 0) {
+                    bot.chat("Stop what? :)")
+                    console.log(`Hint: type "!stop following" or "!stop pathfinding"!`)
+                }
+                else if (args.length > 1) {
+                    bot.chat("That's too many words, I don't understand :(")
+                    console.log(`Hint: type "!stop following" or "!stop pathfinding"!`)
+                }
+                else {
+                    bot.chat(await stop(args[0]))
+                }
             // Command to echo a message in Minecraft chat
             case 'echo':
                 // Check if arguments are provided
@@ -166,10 +178,21 @@ async function handleCommand(username: string, commandName: string, args: any, i
                 bot.setControlState('back', false)
                 break;
             case 'pathfind':
-                bot.setControlState('sprint', true)
-                goal = new goals.GoalGetToBlock(args[0], args[1], args[2])
-                await bot.pathfinder.goto(goal)
-                break;
+                if (botStates.following) {
+                    bot.chat("I can't pathfind when I'm following someone! :(")
+                    break
+                }
+                else if (botStates.moving) {
+                    bot.chat("Please wait! I'm still pathfinding :(")
+                    break
+                }
+                else {
+                    bot.setControlState('sprint', true)
+                    botStates.moving = true;
+                    goal = new goals.GoalGetToBlock(args[0], args[1], args[2])
+                    await bot.pathfinder.goto(goal)
+                    break;
+                }
             case 'follow':
                 bot.setControlState("sprint", true)
                 botFollowPlayer(username, 2)
@@ -184,7 +207,7 @@ async function handleCommand(username: string, commandName: string, args: any, i
     }
     else if (inputHash != hash) {
         bot.chat("Invalid hash! :(")
-        return hash
+        return hash;
     }
     else {
         console.warn("Commands aren't working...")
@@ -200,6 +223,9 @@ async function botFollowPlayer(username: string, range: number) {
 	if (botStates.following) {
 		bot.chat("Sorry, can't run this command more than once!");
 	}
+    if (botStates.moving) {
+        bot.chat("I can't follow when I'm pathfinding! :(")
+    }
 	botStates.following = true;
 	if (!player?.entity) {
 		bot.chat(`${username}, I can't see you! :(`);
@@ -226,6 +252,26 @@ async function botFollowPlayer(username: string, range: number) {
             return;
         }
     }
+}
+
+async function stop(option: string): Promise<string>{
+    if (option === "following") {
+        if (!botStates.following) {
+            return "I'm not following anyone :("
+        }
+        botStates.following = false
+        bot.pathfinder.stop()
+    }
+    if (option === "pathfinding") {
+        bot.pathfinder.stop()
+        botStates.moving = false;
+        return "Stopped pathfinding!"
+    }
+    if (option === "attacking") {
+        bot.pathfinder.stop()
+        return "Fine, I've stopped attacking... I'm bored though ^-^"
+    }
+    else return "Invalid input!"
 }
 
 // Event listener for successful login
