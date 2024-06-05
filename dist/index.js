@@ -53,6 +53,8 @@ function onSpawn() {
             const commandName = command.replace("!", "");
             const args = words;
             const inputHash = args.pop();
+            if (inputHash == undefined)
+                return;
             hash = await handleCommand(name, commandName, args, inputHash, hash);
         }
     });

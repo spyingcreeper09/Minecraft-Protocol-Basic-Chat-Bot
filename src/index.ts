@@ -72,12 +72,14 @@ function onSpawn() {
             // Extract command name and arguments from the message
             const words = message.trim().split(/\s+/);
             const command = words.shift();
-            if (command == undefined) return;
+            if (command == undefined) return; // Fix "undefined not allowed" in constitutional command
             const commandName = command.replace("!", "");
             const args = words;
             // Get the hash from the message
             const inputHash = args.pop();
+            if (inputHash == undefined) return; // Fix "undefined not allowed" in handleCommand()
             hash = await handleCommand(name, commandName, args, inputHash, hash); // Below this function shows the commands, edit it to your liking
+            
         }
     });
 }
