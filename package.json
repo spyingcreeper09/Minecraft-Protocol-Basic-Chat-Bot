@@ -1,5 +1,38 @@
 {
+  "name": "basic-hashbot",
+  "version": "1.0.0",
+  "description": "A simple hash bot made by spyingcreeper09 (GitHub) and SonicandTailsCD (GitHub) :)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot.git"
+  },
+  "keywords": [
+    "bot",
+    "hashbot",
+    "SonicandTailsCD",
+    "spyingcreeper09",
+    "minecraft"
+  ],
+  "author": "spyingcreeper09 and SonicandTailsCD",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot/issues"
+  },
+  "homepage": "https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot#readme",
   "dependencies": {
-    "minecraft-protocol": "^1.47.0"
-  }
+		"minecraft-data": "^3.31.0",
+		"mineflayer": "^4.8.1"
+	},
+	"devDependencies": {
+		"prismarine-block": "^1.17.1",
+		"prismarine-chat": "^1.8.0",
+		"prismarine-entity": "^2.3.1",
+		"prismarine-item": "^1.14.0",
+		"prismarine-registry": "^1.7.0",
+		"prismarine-windows": "^2.6.1"
+	}
 }
