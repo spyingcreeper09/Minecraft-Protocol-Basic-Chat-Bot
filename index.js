@@ -1,5 +1,7 @@
-// Import the minecraft-protocol library
+// Import the mineflayer library
 const mc = require('mineflayer');
+
+// Created with hard work, by @spyingcreeper09 :)
 
 // Bot setup constants
 const botName = 'Bot'; // Replace with a username to your liking for your bot
