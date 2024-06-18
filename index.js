@@ -5,8 +5,8 @@ const mc = require('mineflayer');
 
 // Bot setup constants
 const botName = 'Bot'; // Replace with a username to your liking for your bot
-const serverIp = 'SonicandTailsCDJava.aternos.me'; // Replace with your server's IP address
-const serverPort = 59390; // Replace with your server's port
+const serverIp = '127.0.0.1'; // Replace with your server's IP address (or leave this untouched if you just want to run your bot locally)
+const serverPort = 59390; // Replace with your server's port (in case of local LAN, input the port Minecraft sends to you)
 const prefix = '!'; // Command prefix used to identify commands to this bot
 
 // Create Minecraft client object
@@ -27,7 +27,7 @@ function onSpawn() {
     console.log(`Hash: ${hash}`);
     client.on("chat", async (name, message) => {
         if (name == botName) return
-        console.log(`[Chat] ${name}: ${message}`)
+        console.log(`[Chat] ${name}: ${message}`) // Add "// " (yes, with the space) behind this line of code (behind console.log) to disable chat echo. Want a user-friendly simple bot? This repo isn't for you, please go to SonicandTailsCD's own repo. :)
         // Check if message starts with command prefix
         if (message.charAt(0) == prefix) {
             // Extract command name and arguments from the message
@@ -43,16 +43,17 @@ function onSpawn() {
                     // Generate a new hash
                     hash = generateRandomCode(8);
                     console.log(`New hash: ${hash}`);
-                    console.log(`\nCommand: ${commandName}\nArguments: ${args.join(" ")}`)
-                    // Call command handler with extracted command name and arguments
-                    handleCommand(client, commandName, args); // Below this function shows the commands, edit it to your liking
+                    // console.log(`\nCommand: ${commandName}\nArguments: ${args.join(" ")}`) // Remove the "//" from " console.log" if you have a problem with commands being run - could help you bug report it later
+                    // Asynchronously call the command handler function, with already-parsed command name and arguments
+                    await handleCommand(client, commandName, args); // Below this function shows the command handler, edit it to your liking
                 } else {
                     // Reject and don't do anything if hash is invalid
                     client.chat('Invalid hash :(');
                 }
             }
             catch (err) {
-                client.chat("Unable to reach hash variable :(")
+                client.chat("Unable to reach hash variable :(") 
+                console.log(String(err?.message)) // In case of failure, the bot catches it and comments it to the console. Use the command output to report a bug, and don't forget to report bugs!
             }
         }
     });
@@ -65,17 +66,18 @@ async function handleCommand(client, commandName, args) {
         case 'countdown':
             // Check if no arguments are provided
             if (args.length == 0) {
+                // Inform user of incorrect command usage
+                client.chat('Invalid arguments for this command. Usage: !countdown [message to output] (Counts down from 3)'); // Later on, I will introduce an option to choose how many seconds the bot counts to
+            } 
+            else {
                 // count down from 3
                 client.chat('3');
-                await sleep(200); // Delay to prevent rapid chat commands
+                await sleep(100); // Delay to prevent rapid chat commands
                 client.chat('2');
-                await sleep(200); // Delay in milliseconds
+                await sleep(100); // Delay in milliseconds
                 client.chat('1');
-                await sleep(200);
-                client.chat('Countdown complete');
-            } else {
-                // Inform user of incorrect command usage
-                client.chat('Invalid arguments for countdown command. Usage: !countdown');
+                await sleep(1000);
+                client.chat(args.join(" "));
             }
             break;
         // Command to perform self-care actions in Minecraft
