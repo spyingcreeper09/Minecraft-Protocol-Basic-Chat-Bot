@@ -14,8 +14,11 @@ import pathfinderPkg from 'mineflayer-pathfinder';
 import {
     lookAtEntity,
     sleep,
-    botStates
+    botStates,
+    runBackgroundTask
 } from "./helper.js"
+import { isNumberObject } from 'util/types'
+import { isNumber } from 'util'
 const { pathfinder, Movements, goals } = pathfinderPkg;
 
 // Bot setup + placeholder constants
@@ -172,6 +175,25 @@ async function handleCommand(username: string, commandName: string, args: any, i
                     bot.chat('Invalid arguments for echo command. Usage: !echo <phrase to echo>');
                 }
                 break;
+            case "filter:":
+                // Full plans of adding filters
+                if (args.length == 0) {
+                    bot.whisper(username, "I can't filter a player if not told which!")
+                }
+                else if (args.length == 1) {
+                    bot.whisper(username, "Ok, you've given me a player name, but what do you want me to do to them? A mute? Or simply spam-kick?")
+                }
+                else if (args.length == 4 && args[1] == "spam" && args[2] == "kick") {
+                    bot.whisper(username, "For how long??")
+                }
+                else if (args.length == 2 && args[1] == "mute") {
+                    var callbackID = setInterval(runBackgroundTask(args[0], args[1], botName), 2000)
+                    console.log(`${callbackID} is your callback ID. Don't forget it, because if you do, you'll have to restart the bot to clear filters!`)
+                }
+                else if (args.length > 3 && args[0] == "spam" && args[1] == "kick" && typeof args[2] == 'string' && args[3] == "for" && typeof args[4] == 'number' && args[5] == 'times,' && args[6] == 'for' && typeof args[7] == 'string') {
+                    var kickCallbackID = setInterval(runBackgroundTask(args[2], "spam kick", botName, undefined, args[4]), 10000)
+                    console.log(`${callbackID} is your callback ID. Don't forget it, because if you do, you'll have to restart the bot to clear filters!`)
+                }
             case 'tpowner':
                 bot.chat(`/tp ${botName} ${username}`)
                 console.log(`${botName} teleported to ${username}.`)
