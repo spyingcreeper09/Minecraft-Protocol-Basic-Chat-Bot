@@ -12,11 +12,9 @@ console.log("Loading Mineflayer...")
 import { createBot, Player } from 'mineflayer';
 import pathfinderPkg from 'mineflayer-pathfinder';
 import {
-    lookAtEntity,
     sleep,
     botStates,
-    runBackgroundTask
-} from "./helper.js"
+} from "./helper.js" // Necessary functions - do not modify them, as the helper.ts is planned to stay as is
 import { isNumber } from 'util'
 const { pathfinder, Movements, goals } = pathfinderPkg;
 
@@ -29,6 +27,7 @@ const version = process.argv[5] ? process.argv[5]: "1.18.2";
 let hash: string;
 let exitHash: string;
 let goal; 
+let kickCount: number = 0
 let player: Player;
 const owner: string = "SonicandTailsCD";
 const user_skin_name: string = "Flaphi_"
@@ -75,15 +74,7 @@ async function onSpawn() {
     exitHash = generateRandomCode(20);
     // Now tell the user what his/her hash is
     console.log(`Hash: ${hash}\nAdmin exit hash: ${exitHash}`);
-    bot.chat("/prefix &2[Bots]&r");
-    await sleep(400)
-    bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
-    await sleep(400)
-    bot.chat("/cspy off")
-    await sleep(400)
-    bot.chat(`/sudo ${owner} prefix &2[${botName}'s owner]&r`)
-    await sleep(400)
-    bot.chat(`/skin ${user_skin_name}`)
+    runGreeting()
     bot.on("chat", async (name, message) => {
         if (name == botName) return
         if (message == `!exit ${exitHash}`) process.exit(127)
@@ -122,7 +113,6 @@ async function handleCommand(username: string, commandName: string, args: any, i
         return hash;
     }
     console.log(`[Debug] Command: ${commandName}`)
-    console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`)
     if (publicCommands.includes(commandName)) {
         console.log(`Public command used: ${commandName}`)
         switch (commandName) {
@@ -166,6 +156,7 @@ async function handleCommand(username: string, commandName: string, args: any, i
                 bot.chat(".follow [username] - I will follow a player of your choice, &4using advanced pathfinding that may or may not get me and you banned)")
                 sleep(100)
                 bot.chat("I think that explains it all :)")
+                break;
             case 'countdown':
                 // Check if no arguments are provided
                 if (args.length != 0) {
@@ -192,7 +183,10 @@ async function handleCommand(username: string, commandName: string, args: any, i
         }
         return hash;
     }
-    else if (inputHash === hash) {
+    else {
+        console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`)
+    }
+    if (inputHash === hash) {
         console.log(`[Debug] Command used: ${commandName}`)
         // Check for different commands
         switch (commandName) {
@@ -217,18 +211,20 @@ async function handleCommand(username: string, commandName: string, args: any, i
                 else {
                     bot.chat(`/cspy ${args[0]}`)
                 }
+                break;
             case 'stop':
                 if (args.length = 0) {
                     bot.chat("Stop what? :)")
                     console.log(`Hint: type "!stop following" or "!stop pathfinding"!`)
                 }
-                else if (args.length > 1) {
+                else if (args.length > 2) {
                     bot.chat("That's too many words, I don't understand :(")
                     console.log(`Hint: type "!stop following" or "!stop pathfinding"!`)
                 }
                 else {
-                    bot.chat(await stop(args[0]))
+                    bot.chat(await stop(args[0], args[1] | undefined))
                 }
+                break;
             // Command to echo a message in Minecraft chat
             case 'echo':
                 // Check if arguments are provided
@@ -246,19 +242,13 @@ async function handleCommand(username: string, commandName: string, args: any, i
                     bot.whisper(username, "I can't filter a player if not told which!")
                 }
                 else if (args.length == 1) {
-                    bot.whisper(username, "Ok, you've given me a player name, but what do you want me to do to them? A mute? Or simply spam-kick?")
+                    bot.whisper(username, "Ok, you've given me a player name, but what do you want me to do to them? :)")
                 }
-                else if (args.length == 4 && args[1] == "spam" && args[2] == "kick") {
-                    bot.whisper(username, "For how long??")
-                }
-                else if (args.length == 2 && args[1] == "mute") {
-                    var callbackID = setInterval(runBackgroundTask(args[0], args[1], botName), 2000)
+                else if (args.length == 2 && args[0] == "mute") {
+                    var callbackID = setInterval(() => runBackgroundTask(args[1], args[0], botName), 2000)
                     console.log(`${callbackID} is your callback ID for this mute. Don't forget it, because if you do, you'll have to restart the bot to clear filters!`)
                 }
-                else if (args.length > 3 && args[0] == "spam" && args[1] == "kick" && typeof args[2] == 'string' && args[3] == "for" && typeof args[4] == 'number' && args[5] == 'times,' && args[6] == 'for' && typeof args[7] == 'string') {
-                    var kickCallbackID = setInterval(runBackgroundTask(args[2], "spam kick", botName, undefined, args[4]), 10000)
-                    console.log(`${kickCallbackID} is your callback ID for spam kicking. Don't forget it, because if you do, you'll have to restart the bot to clear filters!`)
-                }
+                break;
             case 'tpowner':
                 bot.chat(`/tp ${botName} ${username}`)
                 console.log(`${botName} teleported to ${username}.`)
@@ -276,6 +266,7 @@ async function handleCommand(username: string, commandName: string, args: any, i
                     break
                 }
                 else {
+                    bot.chat("Coming! :D")
                     bot.setControlState('sprint', true)
                     botStates.moving = true;
                     goal = new goals.GoalGetToBlock(args[0], args[1], args[2])
@@ -285,9 +276,10 @@ async function handleCommand(username: string, commandName: string, args: any, i
             case 'follow':
                 bot.setControlState("sprint", true)
                 botFollowPlayer(username, 2)
+                break;
             // Add more cases for other commands here
             default:
-                // Log unknown commands to console
+                // Log unknown commands to the player
                 bot.chat(`${commandName} isn't a command :()`);
         }
         const newhash = generateRandomCode(12)
@@ -342,7 +334,46 @@ async function botFollowPlayer(username: string, range: number) {
     }
 }
 
-async function stop(option: string): Promise<string>{
+// Event listener for successful login
+bot.once('spawn', onSpawn);
+
+// --------------------------------------------------
+
+// Code that most likely does not need modification, don't risk changing anything here
+function runBackgroundTask(player: string, task: string, bot_name: string) {
+    if (!task) return;
+    if (!player) return;
+    if (!bot_name) return;
+    if (task == "mute") {
+        bot.chat(`/mute ${player} Filtered by ${bot_name}! >:)`)
+    }
+}
+
+async function runGreeting() {
+    bot.chat("/prefix &2[Bots]&r");
+    await sleep(400)
+    bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
+    await sleep(400)
+    bot.chat("/cspy off")
+    await sleep(400)
+    bot.chat(`/sudo ${owner} prefix &2[${botName}'s owner]&r`)
+    await sleep(400)
+    bot.chat(`/skin ${user_skin_name}`)
+    await sleep(400)
+    bot.chat(`/sudo ${owner} skin ${user_skin_name}`)
+    await sleep(400)
+    bot.chat(`/tag ${botName} add netmsg`)
+    await sleep(800)
+    bot.chat(`/sudo ${owner} tag ${owner} add netmsg_Kaboom`)
+    await sleep(800)
+    bot.chat(`/tag ZenDev add netmsg`)
+}
+
+async function lookAtEntity(entity: any, force = false) {
+    await bot.lookAt(entity.position.offset(0, entity.height, 0), force);
+}
+
+async function stop(option: string, callbackID?: number | undefined): Promise<string>{
     if (option === "following") {
         if (!botStates.following) {
             return "I'm not following anyone :("
@@ -355,12 +386,12 @@ async function stop(option: string): Promise<string>{
         botStates.moving = false;
         return "Stopped pathfinding!"
     }
-    if (option === "attacking") {
-        bot.pathfinder.stop()
-        return "Fine, I've stopped attacking... I'm bored though ^-^"
+    if (option === "filter" && callbackID != undefined && typeof callbackID == "number") {
+        clearInterval(callbackID)
+        return `There! I've stopped filter number ${callbackID}. :)`;
     }
-    else return "Invalid input!"
+    else if (option === "filter" && callbackID == undefined) {
+        return "I cannot stop filtering if I don't have the callback ID, silly :)"
+    }
+    else return "What's there to stop??"
 }
-
-// Event listener for successful login
-bot.once('spawn', onSpawn);

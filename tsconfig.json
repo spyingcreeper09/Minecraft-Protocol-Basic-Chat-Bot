@@ -101,14 +101,9 @@
 		// "skipLibCheck": true                                 /* Skip type checking all .d.ts files. */
 	},
 	"include": [
-		"src/*",
-		"src/init/setOpts.ts",
-		"src/builtin_plugins/*"
+		"src/*"
 	],
 	"exclude": [
-		"package.json",
-		"node_modules/mineflayer/index.d.ts",
-		"node_modules/mineflayer-pathfinder/index.d.ts",
-		"node_modules/*"
+		"package.json", "node_modules"
 	]
 }
