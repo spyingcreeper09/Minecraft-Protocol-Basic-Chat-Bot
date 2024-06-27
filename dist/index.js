@@ -16,17 +16,17 @@ const serverIp = process.argv[2];
 const serverPort = process.argv[3] ? process.argv[3] : 25565;
 const prefix = '.';
 const version = process.argv[5] ? process.argv[5] : "1.18.2";
-let hash;
-let exitHash;
-let goal;
-let kickCount = 0;
-let player;
 const owner = "SonicandTailsCD";
 const user_skin_name = "Flaphi_";
 const knownSpamBots = [
     "uwu",
     "fTcxOGld"
 ];
+let hash;
+let exitHash;
+let goal;
+let kickCount = 0;
+let player;
 console.log("Joining server...");
 const options = {
     host: serverIp,
@@ -54,11 +54,19 @@ async function onSpawn() {
     bot.on("chat", async (name, message) => {
         if (name == botName)
             return;
-        if (message == `!exit ${exitHash}`)
+        if (message == `Close yourself. My admin hash is ${exitHash}`) {
+            bot.chat(`Ok ${name} :D`);
             process.exit(127);
+        }
         if (message == "?") {
             console.log(`[Chat] ${name}: ${message}`);
             return;
+        }
+        if (message == "Robo?") {
+            bot.chat(`Yes, ${name}? :)`);
+        }
+        if (message == ".specs show 76642 263 82457 23") {
+            console.log("I do not have advanced detection, but what I can see is this PC runs Linux 5.10 Vendor_ID: 0x254 (Raspbian). :)");
         }
         console.log(`[Chat] ${name}: ${message}`);
         if (message.charAt(0) == prefix) {
@@ -187,7 +195,7 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                     console.log(`Hint: type "!stop following" or "!stop pathfinding"!`);
                 }
                 else {
-                    bot.chat(await stop(args[0], args[1] | undefined));
+                    bot.chat(await stop(args[0], args[1] ? args[1] : undefined));
                 }
                 break;
             case 'echo':

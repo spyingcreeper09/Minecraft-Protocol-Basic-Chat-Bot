@@ -23,18 +23,20 @@ const botName = process.argv[4] ? process.argv[4]: "Bot"; // This isn't necessar
 const serverIp = process.argv[2]; // User's chosen server's IP address
 const serverPort = process.argv[3] ? process.argv[3]: 25565; // User's server's port
 const prefix = '.'; // Command prefix used to identify commands to this bot
-const version = process.argv[5] ? process.argv[5]: "1.18.2";
+const version = process.argv[5] ? process.argv[5]: "1.18.2"; // Don't change this! If you do not type a version, Robo will automatically try to guess 1.18. Most servers have ViaVersion - LEAVE IT AS IS or you may get errors!
+const owner: string = "SonicandTailsCD"; // The owner that actually owns the bot
+const user_skin_name: string = "Flaphi_" // If your server has it, the bot can automatically load a skin for you. Change the name to your favorite premium account's skin :)
+const knownSpamBots: string[] = [
+    "uwu",
+    "fTcxOGld"
+] // These are the bots known to spam servers. Placing their names here will make Robo ignore command spy/normal messages from these.
+
+// Variables that I commonly need to refresh. Please do not delete any variables below unless you wish to get an error :)
 let hash: string;
 let exitHash: string;
 let goal; 
 let kickCount: number = 0
 let player: Player;
-const owner: string = "SonicandTailsCD";
-const user_skin_name: string = "Flaphi_"
-const knownSpamBots: string[] = [
-    "uwu",
-    "fTcxOGld"
-]
 
 // Create Minecraft client object
 console.log("Joining server...")
@@ -77,10 +79,19 @@ async function onSpawn() {
     runGreeting()
     bot.on("chat", async (name, message) => {
         if (name == botName) return
-        if (message == `!exit ${exitHash}`) process.exit(127)
+        if (message == `Close yourself. My admin hash is ${exitHash}`) {
+            bot.chat(`Ok ${name} :D`)
+            process.exit(127)
+        }
         if (message == "?") {
             console.log(`[Chat] ${name}: ${message}`);
             return
+        }
+        if (message == "Robo?") {
+            bot.chat(`Yes, ${name}? :)`)
+        }
+        if (message == ".specs show 76642 263 82457 23") {
+            console.log("I do not have advanced detection, but what I can see is this PC runs Linux 5.10 Vendor_ID: 0x254 (Raspbian). :)")
         }
         console.log(`[Chat] ${name}: ${message}`)
         // Check if message starts with command prefix
@@ -222,7 +233,7 @@ async function handleCommand(username: string, commandName: string, args: any, i
                     console.log(`Hint: type "!stop following" or "!stop pathfinding"!`)
                 }
                 else {
-                    bot.chat(await stop(args[0], args[1] | undefined))
+                    bot.chat(await stop(args[0], args[1] ? args[1]: undefined))
                 }
                 break;
             // Command to echo a message in Minecraft chat
