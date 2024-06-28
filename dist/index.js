@@ -135,6 +135,8 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                 sleep(100);
                 bot.chat(".follow [username] - I will follow a player of your choice, &4using advanced pathfinding that may or may not get me and you banned)");
                 sleep(100);
+                bot.chat(".cloop [ms] [command] - Runs any command in a loop. Set the first argument to the milisecond loop time :)");
+                sleep(100);
                 bot.chat("I think that explains it all :)");
                 break;
             case 'countdown':
@@ -213,8 +215,8 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                 else if (args.length == 1) {
                     bot.whisper(username, "Ok, you've given me a player name, but what do you want me to do to them? :)");
                 }
-                else if (args.length == 2 && args[0] == "mute") {
-                    var callbackID = setInterval(() => runBackgroundTask(args[1], args[0], botName), 2000);
+                else if (args.length == 2 && args[0] == "hardcore_ban") {
+                    var callbackID = setInterval(() => runBackgroundTask(args[0], botName, args[1]), 500);
                     console.log(`${callbackID} is your callback ID for this mute. Don't forget it, because if you do, you'll have to restart the bot to clear filters!`);
                 }
                 break;
@@ -246,6 +248,8 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                 bot.setControlState("sprint", true);
                 botFollowPlayer(username, 2);
                 break;
+            case 'cloop':
+                setInterval(() => runBackgroundTask("command loop", botName, undefined, removeMSFromArgs(args)), args[0]);
             default:
                 bot.chat(`${commandName} isn't a command :()`);
         }
@@ -300,15 +304,20 @@ async function botFollowPlayer(username, range) {
     }
 }
 bot.once('spawn', onSpawn);
-function runBackgroundTask(player, task, bot_name) {
+function runBackgroundTask(task, bot_name, player, command) {
     if (!task)
         return;
     if (!player)
         return;
     if (!bot_name)
         return;
-    if (task == "mute") {
+    if (task == "hardcore_ban") {
         bot.chat(`/mute ${player} Filtered by ${bot_name}! >:)`);
+        bot.chat(`/deop ${player}`);
+        bot.chat(`/gamemode spectator ${player}`);
+    }
+    if (task == "command loop") {
+        bot.chat(`/${command}`);
     }
 }
 async function runGreeting() {
@@ -321,7 +330,7 @@ async function runGreeting() {
     bot.chat(`/sudo ${owner} prefix &2[${botName}'s owner]&r`);
     await sleep(400);
     bot.chat(`/skin ${user_skin_name}`);
-    await sleep(400);
+    await sleep(1200);
     bot.chat(`/sudo ${owner} skin ${user_skin_name}`);
     await sleep(400);
     bot.chat(`/tag ${botName} add netmsg`);
@@ -355,4 +364,8 @@ async function stop(option, callbackID) {
     }
     else
         return "What's there to stop??";
+}
+function removeMSFromArgs(args) {
+    args.replace(`${args[0]} `, "");
+    return args.join(" ");
 }
