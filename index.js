@@ -2,6 +2,7 @@
 const mc = require('mineflayer');
 
 // Created with hard work, by @spyingcreeper09 :)
+// I only did the base of it. You debugged further then i even thought was possible with this bot lol. You have to take soem credit too
 
 // Bot setup constants
 const botName = 'Bot'; // Replace with a username to your liking for your bot
