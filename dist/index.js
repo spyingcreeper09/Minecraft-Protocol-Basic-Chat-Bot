@@ -285,10 +285,12 @@ async function handleCommand(username, commandName, args, hash) {
 async function botFollowPlayer(username, range) {
     player = bot.players[username];
     if (botStates.following) {
-        bot.chat("Sorry, can't run this command more than once!");
+        bot.chat("I'm already following! :(");
+        return;
     }
     if (botStates.moving) {
         bot.chat("I can't follow when I'm pathfinding! :(");
+        return;
     }
     botStates.following = true;
     if (!player?.entity) {
@@ -344,7 +346,7 @@ async function runBackgroundTask(task, bot_name, player, ms, command) {
 }
 async function runGreeting() {
     await sleep(2000);
-    bot.chat("/prefix &l&a[&#006400Bots&r&f&l&a]");
+    bot.chat("/extras:prefix &l&a[&#006400Bots&r&f&l&a]");
     await sleep(400);
     bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
     await sleep(400);
