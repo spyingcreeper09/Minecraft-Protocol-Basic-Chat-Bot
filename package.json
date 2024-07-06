@@ -1,16 +1,16 @@
 {
-  "name": "basic-hashbot",
-  "version": "1.0.0",
+  "name": "sonicandtailscd-mcphashbot",
+  "version": "2.0.0",
   "description": "A simple hash bot made by spyingcreeper09 (GitHub) and SonicandTailsCD (GitHub) :)",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "test": "node dist/index.js",
+    "test": "node dist/index.js play.kaboom.pw 25565 Robo 1.18.2",
     "build": "eslint . --fix & tsc & echo"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot.git"
+    "url": "git+https://github.com/SonicandTailsCD/Minecraft-Protocol-Basic-Chat-Bot.git"
   },
   "keywords": [
     "bot",
@@ -22,9 +22,9 @@
   "author": "spyingcreeper09 and SonicandTailsCD",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot/issues"
+    "url": "https://github.com/SonicandTailsCD/Minecraft-Protocol-Basic-Chat-Bot/issues"
   },
-  "homepage": "https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot#readme",
+  "homepage": "https://github.com/SonicandTailsCD/Minecraft-Protocol-Basic-Chat-Bot#readme",
   "dependencies": {
     "eslint": "^8.36.0",
     "minecraft-data": "^3.31.0",

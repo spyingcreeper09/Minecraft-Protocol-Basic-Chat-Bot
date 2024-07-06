@@ -6,26 +6,25 @@ if (process.argv.length < 3) {
     console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] (optional: [server port] [name] [version])`);
     process.exit(1);
 }
+'use strict';
 console.log("Loading Mineflayer...");
 import { createBot } from 'mineflayer';
 import pathfinderPkg from 'mineflayer-pathfinder';
 import { sleep, botStates, } from "./helper.js";
+import * as os from 'node:os';
 const { pathfinder, Movements, goals } = pathfinderPkg;
-const botName = process.argv[4] ? process.argv[4] : "Bot";
+const botName = process.argv[4] ? process.argv[4] : "Robo";
 const serverIp = process.argv[2];
 const serverPort = process.argv[3] ? process.argv[3] : 25565;
 const prefix = '.';
 const version = process.argv[5] ? process.argv[5] : "1.18.2";
 const owner = "SonicandTailsCD";
 const user_skin_name = "Flaphi_";
-const knownSpamBots = [
-    "uwu",
-    "fTcxOGld"
-];
+const default_countdown_length = 5;
+const seconds_countdown_limit = 120;
 let hash;
 let exitHash;
 let goal;
-let kickCount = 0;
 let player;
 console.log("Joining server...");
 const options = {
@@ -65,8 +64,8 @@ async function onSpawn() {
         if (message == "Robo?") {
             bot.chat(`Yes, ${name}? :)`);
         }
-        if (message == ".specs show 76642 263 82457 23") {
-            console.log("I do not have advanced detection, but what I can see is this PC runs Linux 5.10 Vendor_ID: 0x254 (Raspbian). :)");
+        if (message == `${prefix}specs sensitive show ${hash}`) {
+            bot.chat(`/tellraw @a [{"text": "From what I see here:\\n"}, {"text": "The OS I'm running on is ${os.platform()} ${os.type()}!\\n"}, {"text": "Available free memory for Robo to use: ${os.freemem() / 1024 / 1024}MB\\n"}, {"text": "CPU cores available for all processes: ${os.cpus().length}\\n"}, {"text": "My OS' hostname: ${os.hostname()}\\n"}, {"text": "CPU architecture: ${os.arch()}"}, {"text": "Uptime of this PC: ${os.uptime()}"}, {"text": "&2Robo&r: That's all I can say :)"}]`);
         }
         console.log(`[Chat] ${name}: ${message}`);
         if (message.charAt(0) == prefix) {
@@ -76,8 +75,7 @@ async function onSpawn() {
                 return;
             const commandName = command.replace(prefix, "");
             const args = words;
-            const inputHash = args.pop();
-            hash = await handleCommand(name, commandName, args, inputHash, hash);
+            hash = await handleCommand(name, commandName, args, hash);
         }
     });
 }
@@ -86,88 +84,114 @@ const publicCommands = [
     "validate",
     "help"
 ];
-async function handleCommand(username, commandName, args, inputHash, hash) {
-    if (commandName == "[object Undefined]") {
-        console.log(`[ERR] Bot username: ${username}\nInput hash: ${inputHash}\nCurrent hash: ${hash}`);
-        console.trace(`The command returned undefined. Tracing now:`);
-        return hash;
-    }
+async function handleCommand(username, commandName, args, hash) {
     console.log(`[Debug] Command: ${commandName}`);
     if (publicCommands.includes(commandName)) {
         console.log(`Public command used: ${commandName}`);
         switch (commandName) {
-            case 'validate':
-                if (hash == inputHash) {
-                    bot.chat(`That's a valid Owner hash! :)`);
-                    hash = generateRandomCode(12);
-                    console.log(`Hash: ${hash}`);
-                }
-                else {
-                    bot.chat('Invalid hash :(');
-                }
-                break;
             case 'help':
+                if (botStates.reciting.help) {
+                    bot.chat(`/t ${username} I've already told everyone my commands, please wait 60 seconds. :)`);
+                }
+                ;
+                botStates.reciting.help = true;
                 bot.chat("I can run these commands:");
                 sleep(100);
                 bot.chat("&2For all players&r:");
                 sleep(100);
                 bot.chat(".countdown [optional message] - I count down from 3 to 0. Type a message after the command and I'll speak it when I'm done.");
                 sleep(100);
-                bot.chat(".validate [hash] - Validates any hash &4(BEWARE! This will make a new hash!)");
-                sleep(100);
                 bot.chat(".help - well of course, this help");
                 sleep(100);
-                bot.chat(`&4Only for ${owner} or for people who has my hash&r:`);
+                bot.chat(".validate [hash] - Validates any hash &4(BEWARE! This will make a new hash!)");
                 sleep(100);
-                bot.chat(".selfcare - Ensures I'm an operator and sets me in Creative");
+                bot.chat(`&4Only for ${owner} or for people who have my hash&r:`);
+                sleep(100);
+                bot.chat(".cloop [ms] [command] - Runs any command in a loop. Set the first argument to the milisecond loop time :)");
                 sleep(100);
                 bot.chat(".cspy [optional ON/OFF] - enable or disable my command spying abilities");
-                sleep(100);
-                bot.chat(".stop [following, pathfinding, filter] - Stop the action that my owner told me to");
                 sleep(100);
                 bot.chat(".echo [message] - Repeat back a word... or many :P");
                 sleep(100);
                 bot.chat(".filter: [args] - Ban a player, &4hardcore&r-like method!");
                 sleep(100);
-                bot.chat(".tpowner - Self-explanatory!");
+                bot.chat(".follow [username] - I will follow a player of your choice, &4using advanced pathfinding that may or may not get me and you banned)");
                 sleep(100);
                 bot.chat(".pathfind [x] [y] [z] - Calculate and go to a specific location (&4WARNING: I run on a not-so-beastly PC and this WILL LAG!!!)");
                 sleep(100);
-                bot.chat(".follow [username] - I will follow a player of your choice, &4using advanced pathfinding that may or may not get me and you banned)");
+                bot.chat(".selfcare - Ensures I'm an operator and sets me in Creative");
                 sleep(100);
-                bot.chat(".cloop [ms] [command] - Runs any command in a loop. Set the first argument to the milisecond loop time :)");
+                bot.chat(".stop [following, pathfinding, filter] - Stop the action that my owner told me to");
+                sleep(100);
+                bot.chat(".tpowner - Self-explanatory!");
                 sleep(100);
                 bot.chat("I think that explains it all :)");
+                await sleep(60000);
+                botStates.reciting.help = false;
                 break;
             case 'countdown':
                 if (args.length != 0) {
-                    bot.chat('3');
-                    await sleep(1000);
-                    bot.chat('2');
-                    await sleep(1000);
-                    bot.chat('1');
-                    await sleep(1000);
-                    bot.chat(`${args.join(" ")}`);
+                    let countdown_length = args.shift();
+                    if (typeof countdown_length == 'number') {
+                        if (countdown_length > seconds_countdown_limit) {
+                            bot.chat(`Say what now?? ${countdown_length} seconds?! Sorry, I don't want to count from ${countdown_length} to 0, that's boring :)`);
+                            break;
+                        }
+                        await sleep(1000);
+                        for (countdown_length > 0; countdown_length--;) {
+                            bot.chat(`${countdown_length}...`);
+                            await sleep(1000);
+                        }
+                        bot.chat(`${args.join(" ")}`);
+                    }
+                    else {
+                        let counting = default_countdown_length;
+                        for (counting > 0; counting--;) {
+                            bot.chat(`${counting}...`);
+                            await sleep(1000);
+                        }
+                        bot.chat(`${countdown_length} ${args.join(" ")}`);
+                    }
                 }
                 else {
-                    bot.chat('3');
-                    await sleep(1000);
-                    bot.chat('2');
-                    await sleep(1000);
-                    bot.chat('1');
-                    await sleep(1000);
-                    bot.chat('Countdown complete');
+                    let counting = default_countdown_length;
+                    for (counting > 0; counting--;) {
+                        bot.chat(`${counting}...`);
+                        await sleep(1000);
+                    }
+                    bot.chat('Now go! :D');
+                }
+                break;
+            case 'validate':
+                const inputHash = args.pop();
+                if (hash == inputHash) {
+                    bot.chat(`${inputHash} &2is a valid hash! :)`);
+                    hash = generateRandomCode(12);
+                    console.log(`New hash: ${hash}`);
+                }
+                else {
+                    bot.chat(`${inputHash} &4isn't a valid hash :(`);
                 }
                 break;
         }
         return hash;
     }
     else {
+        const inputHash = args.pop();
         console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`);
     }
+    const inputHash = args.pop();
     if (inputHash === hash) {
         console.log(`[Debug] Command used: ${commandName}`);
         switch (commandName) {
+            case 'commandspy':
+                if (args.length = 0) {
+                    bot.chat("/cspy");
+                }
+                else {
+                    bot.chat(`/cspy ${args[0]}`);
+                }
+                break;
             case 'selfcare':
                 if (args.length == 0) {
                     bot.chat('/op @s[type=player]');
@@ -179,16 +203,8 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                     bot.chat('Invalid arguments for selfcare command. Usage: !selfcare');
                 }
                 break;
-            case 'commandspy':
-                if (args.length = 0) {
-                    bot.chat("/cspy");
-                }
-                else {
-                    bot.chat(`/cspy ${args[0]}`);
-                }
-                break;
             case 'stop':
-                if (args.length = 0) {
+                if (args.length == 0) {
                     bot.chat("Stop what? :)");
                     console.log(`Hint: type "!stop following" or "!stop pathfinding"!`);
                 }
@@ -249,7 +265,7 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
                 botFollowPlayer(username, 2);
                 break;
             case 'cloop':
-                setInterval(() => runBackgroundTask("command loop", botName, undefined, removeMSFromArgs(args)), args[0]);
+                setInterval(() => runBackgroundTask("command_loop", botName, undefined, args[0], args.join(" ")), args[0]);
             default:
                 bot.chat(`${commandName} isn't a command :()`);
         }
@@ -267,7 +283,6 @@ async function handleCommand(username, commandName, args, inputHash, hash) {
     }
 }
 async function botFollowPlayer(username, range) {
-    botStates.following = true;
     player = bot.players[username];
     if (botStates.following) {
         bot.chat("Sorry, can't run this command more than once!");
@@ -298,13 +313,13 @@ async function botFollowPlayer(username, range) {
         }
         catch (err) {
             console.log(String(err?.message));
-            bot.chat('Sorry, I\'ve ran into an error. I can\'t keep following you. Please run that command again :)');
+            bot.chat(`Sorry, I'm unable to follow :( (${String(err?.message)})`);
             return;
         }
     }
 }
 bot.once('spawn', onSpawn);
-function runBackgroundTask(task, bot_name, player, command) {
+async function runBackgroundTask(task, bot_name, player, ms, command) {
     if (!task)
         return;
     if (!player)
@@ -313,19 +328,27 @@ function runBackgroundTask(task, bot_name, player, command) {
         return;
     if (task == "hardcore_ban") {
         bot.chat(`/mute ${player} Filtered by ${bot_name}! >:)`);
+        await sleep(100);
         bot.chat(`/deop ${player}`);
+        await sleep(100);
         bot.chat(`/gamemode spectator ${player}`);
+        await sleep(100);
+        return;
     }
-    if (task == "command loop") {
+    if (task == "command_loop") {
+        console.log("It's running.");
+        command?.replace(`${ms} `, "");
         bot.chat(`/${command}`);
+        return;
     }
 }
 async function runGreeting() {
-    bot.chat("/prefix &2[Bots]&r");
+    await sleep(2000);
+    bot.chat("/prefix &l&a[&#006400Bots&r&f&l&a]");
     await sleep(400);
     bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
     await sleep(400);
-    bot.chat("/cspy off");
+    bot.chat("/cspy on");
     await sleep(400);
     bot.chat(`/sudo ${owner} prefix &2[${botName}'s owner]&r`);
     await sleep(400);
@@ -364,8 +387,4 @@ async function stop(option, callbackID) {
     }
     else
         return "What's there to stop??";
-}
-function removeMSFromArgs(args) {
-    args.replace(`${args[0]} `, "");
-    return args.join(" ");
 }
