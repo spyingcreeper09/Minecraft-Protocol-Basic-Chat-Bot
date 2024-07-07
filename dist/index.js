@@ -1,23 +1,23 @@
-if (process.argv.length > 6) {
-    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] (optional: [server port] [name] [version])`);
+if (process.argv.length > 7) {
+    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`);
     process.exit(1);
 }
-if (process.argv.length < 3) {
-    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] (optional: [server port] [name] [version])`);
+if (process.argv.length < 4) {
+    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`);
     process.exit(1);
 }
 'use strict';
 console.log("Loading Mineflayer...");
 import { createBot } from 'mineflayer';
 import pathfinderPkg from 'mineflayer-pathfinder';
-import { sleep, botStates, } from "./helper.js";
+import { sleep, botStates } from "./helper.js";
 import * as os from 'node:os';
 const { pathfinder, Movements, goals } = pathfinderPkg;
-const botName = process.argv[4] ? process.argv[4] : "Robo";
+const botName = process.argv[5] ? process.argv[5] : "Robo";
 const serverIp = process.argv[2];
 const serverPort = process.argv[3] ? process.argv[3] : 25565;
 const prefix = '.';
-const version = process.argv[5] ? process.argv[5] : "1.18.2";
+const version = process.argv[6] ? process.argv[6] : "1.18.2";
 const owner = "SonicandTailsCD";
 const user_skin_name = "Flaphi_";
 const default_countdown_length = 5;
@@ -26,6 +26,28 @@ let hash;
 let exitHash;
 let goal;
 let player;
+let SlowMode;
+let default_wait_time;
+if (process.argv[4] == "on") {
+    SlowMode = true;
+    default_wait_time = 450;
+}
+else if (process.argv[4] == "ON") {
+    SlowMode = true;
+    default_wait_time = 450;
+}
+else if (process.argv[4] == "off") {
+    SlowMode = false;
+    default_wait_time = 100;
+}
+else if (process.argv[4] == "OFF") {
+    SlowMode = false;
+    default_wait_time = 100;
+}
+else {
+    console.log(`After the server port and before the bot's name, please type in between the two: "on" or "off" if you want Slow Mode on. The bot will not run without this setting :)\nWhy am I now requiring a Slow Mode toggle? Most inexperienced users use slow or high-latency Wi-Fi, which if you use ${botName} in Normal Mode, the server may treat ${botName}'s messages as spam and may get you banned if you use this bot in AntiCheat-enabled servers.\nIf you don't know what's your server's port, most likely it is 25565. Try it! Type "node ${process.argv[1]} ${process.argv[2]} ${process.argv[3] ? process.argv[3] : "25565"} on" :)`);
+    process.exit(2);
+}
 console.log("Joining server...");
 const options = {
     host: serverIp,
@@ -92,39 +114,40 @@ async function handleCommand(username, commandName, args, hash) {
             case 'help':
                 if (botStates.reciting.help) {
                     bot.chat(`/t ${username} I've already told everyone my commands, please wait 60 seconds. :)`);
+                    break;
                 }
                 ;
                 botStates.reciting.help = true;
                 bot.chat("I can run these commands:");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat("&2For all players&r:");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".countdown [optional message] - I count down from 3 to 0. Type a message after the command and I'll speak it when I'm done.");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".help - well of course, this help");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".validate [hash] - Validates any hash &4(BEWARE! This will make a new hash!)");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(`&4Only for ${owner} or for people who have my hash&r:`);
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".cloop [ms] [command] - Runs any command in a loop. Set the first argument to the milisecond loop time :)");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".cspy [optional ON/OFF] - enable or disable my command spying abilities");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".echo [message] - Repeat back a word... or many :P");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".filter: [args] - Ban a player, &4hardcore&r-like method!");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".follow [username] - I will follow a player of your choice, &4using advanced pathfinding that may or may not get me and you banned)");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".pathfind [x] [y] [z] - Calculate and go to a specific location (&4WARNING: I run on a not-so-beastly PC and this WILL LAG!!!)");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".selfcare - Ensures I'm an operator and sets me in Creative");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".stop [following, pathfinding, filter] - Stop the action that my owner told me to");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat(".tpowner - Self-explanatory!");
-                sleep(100);
+                await sleep(default_wait_time);
                 bot.chat("I think that explains it all :)");
                 await sleep(60000);
                 botStates.reciting.help = false;
@@ -330,11 +353,11 @@ async function runBackgroundTask(task, bot_name, player, ms, command) {
         return;
     if (task == "hardcore_ban") {
         bot.chat(`/mute ${player} Filtered by ${bot_name}! >:)`);
-        await sleep(100);
+        await sleep(default_wait_time);
         bot.chat(`/deop ${player}`);
-        await sleep(100);
+        await sleep(default_wait_time);
         bot.chat(`/gamemode spectator ${player}`);
-        await sleep(100);
+        await sleep(default_wait_time);
         return;
     }
     if (task == "command_loop") {
@@ -347,17 +370,17 @@ async function runBackgroundTask(task, bot_name, player, ms, command) {
 async function runGreeting() {
     await sleep(2000);
     bot.chat("/extras:prefix &l&a[&#006400Bots&r&f&l&a]");
-    await sleep(400);
+    await sleep(default_wait_time);
     bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
-    await sleep(400);
+    await sleep(default_wait_time);
     bot.chat("/cspy on");
-    await sleep(400);
+    await sleep(default_wait_time);
     bot.chat(`/sudo ${owner} prefix &2[${botName}'s owner]&r`);
-    await sleep(400);
+    await sleep(default_wait_time);
     bot.chat(`/skin ${user_skin_name}`);
     await sleep(1200);
     bot.chat(`/sudo ${owner} skin ${user_skin_name}`);
-    await sleep(400);
+    await sleep(default_wait_time);
     bot.chat(`/tag ${botName} add netmsg`);
     await sleep(800);
     bot.chat(`/sudo ${owner} tag ${owner} add netmsg_Kaboom`);
