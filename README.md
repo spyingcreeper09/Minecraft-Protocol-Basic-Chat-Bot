@@ -2,6 +2,10 @@ Special thanks to @spyingcreeper09 for allowing me to build upon his repo!
 Check his repo out [here](https://github.com/spyingcreeper09/Minecraft-Protocol-Basic-Chat-Bot). Follow him too AND ME!!! :D
 WARNING: This repository uses Mineflayer for the time being.
 
+**WARNING!!!** There are currently impersonators connecting to KaBOOM pretending to be me. For security reasons, I will be deleting this repository and recreating it as private, to prevent hackers from using Robo's code as if it was me. Some people will be automatically invited to collaborate.
+There are vulnerabilities I've found that can allow anyone to control your computer and the bot because of outdated dependencies that Mineflayer requires. Please do not use Robo until there is a fix that depends on `punycode`, or if you're going to anyway, **AVOID KABOOM and chipmunk.land if Robo is already online!!!** 
+From the point of this commit, you have exactly 30 minutes to download the source while you still can. Enjoy the final, open-source version of Robo, before Robo goes closed-source. :(
+
 How To Run
 1. Install Node.js - https://nodejs.org/en/download
 2. Download this repository (or clone with `git clone https://github.com/SonicandTailsCD/Minecraft-Protocol-Basic-Chat-Bot.git`)
