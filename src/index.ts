@@ -1,10 +1,10 @@
 if (process.argv.length > 7) {
-    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`)
-    process.exit(1)
+    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] [server port] [on/off for Slow Mode] (optional: [name] [version])`);
+    process.exit(1);
 }
 if (process.argv.length < 4) {
-    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`)
-    process.exit(1)
+    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] [server port (try writing "25565" if unsure)] [on/off for Slow Mode] (optional: [name] [version])`);
+    process.exit(1);
 }
 
 
@@ -40,6 +40,7 @@ let goal;
 let player: Player;
 let SlowMode: boolean;
 let default_wait_time: number;
+let inputHash: string;
 
 if (process.argv[4] == "on") {
     SlowMode = true;
@@ -103,7 +104,7 @@ async function onSpawn() {
     runGreeting()
     bot.on("chat", async (name, message) => {
         if (name == botName) return
-        if (message == `Close yourself. My admin hash is ${exitHash}`) {
+        if (message == `YOU HAVE BEEN TERMINATED: ${exitHash}`) {
             bot.chat(`Ok ${name} :D`)
             process.exit(127)
         }
@@ -222,7 +223,7 @@ async function handleCommand(username: string, commandName: string, args: any, h
                 break;
             // If the command used is .validate
             case 'validate':
-                const inputHash = args.pop(); // Validate removes the final argument, to actually verify a hash. Do not change this line, or there may be issues :)
+                inputHash = args.pop(); // Validate removes the final argument, to actually verify a hash. Do not change this line, or there may be issues :)
                 if (hash == inputHash) { // simple strict logic to ensure the hash is actually what it is (enforces case-sensitive)
                     bot.chat(`${inputHash} &2is a valid hash! :)`); // the &4 isn't a mistake - for servers that support it, this is chat color!
                     hash = generateRandomCode(12); // Now make a new hash
@@ -235,11 +236,10 @@ async function handleCommand(username: string, commandName: string, args: any, h
         return hash;
     }
     else {
-        const inputHash = args.pop(); 
+        inputHash = args.pop(); // remove the user-inputted hash from the last message they sent in Minecraft
         console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`) // debugging, this shouldn't be here
     }
-    const inputHash = args.pop(); // remove the user-inputted hash from the last message they sent in Minecraft
-    if (inputHash === hash) {
+    if (inputHash == hash) {
         console.log(`[Debug] Command used: ${commandName}`)
         // Check for different commands
         switch (commandName) {
@@ -333,6 +333,7 @@ async function handleCommand(username: string, commandName: string, args: any, h
                 break;
             case 'cloop': 
                 setInterval(() => runBackgroundTask("command_loop", botName, undefined, args[0], args.join(" ")), args[0])
+                break;
             // Add more cases for other commands here
             default:
                 // Log unknown commands to the player
@@ -399,7 +400,6 @@ bot.once('spawn', onSpawn);
 // Code that most likely does not need modification, don't risk changing anything here
 async function runBackgroundTask(task: string, bot_name: string, player?: string, ms?: number, command?: string) {
     if (!task) return;
-    if (!player) return;
     if (!bot_name) return;
     if (task == "hardcore_ban") {
         bot.chat(`/mute ${player} Filtered by ${bot_name}! >:)`)
@@ -411,7 +411,6 @@ async function runBackgroundTask(task: string, bot_name: string, player?: string
         return;
     }
     if (task == "command_loop") {
-        console.log("It's running.")
         command?.replace(`${ms} `, "")
         bot.chat(`/${command}`)
         return;
@@ -422,7 +421,7 @@ async function runGreeting() {
     await sleep(2000)
     bot.chat("/extras:prefix &l&a[&#006400Bots&r&f&l&a]");
     await sleep(default_wait_time)
-    bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
+    bot.chat(`&2Hello, &3${owner}&2! Ready for work, as I always am! :D`);
     await sleep(default_wait_time)
     bot.chat("/cspy on")
     await sleep(default_wait_time)

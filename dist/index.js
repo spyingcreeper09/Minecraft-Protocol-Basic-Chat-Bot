@@ -1,9 +1,9 @@
 if (process.argv.length > 7) {
-    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`);
+    console.log(`That's too many arguments! :( \nThe proper way to use this script is: node ${process.argv[1]} [server IP] [server port] [on/off for Slow Mode] (optional: [name] [version])`);
     process.exit(1);
 }
 if (process.argv.length < 4) {
-    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] [on/off for Slow Mode] (optional: [server port] [name] [version])`);
+    console.log(`Oh hi! You must be new :)\nThe proper way to use this script is the following:\n node ${process.argv[1]} [server IP] [server port (try writing "25565" if unsure)] [on/off for Slow Mode] (optional: [name] [version])`);
     process.exit(1);
 }
 'use strict';
@@ -28,6 +28,7 @@ let goal;
 let player;
 let SlowMode;
 let default_wait_time;
+let inputHash;
 if (process.argv[4] == "on") {
     SlowMode = true;
     default_wait_time = 450;
@@ -75,7 +76,7 @@ async function onSpawn() {
     bot.on("chat", async (name, message) => {
         if (name == botName)
             return;
-        if (message == `Close yourself. My admin hash is ${exitHash}`) {
+        if (message == `YOU HAVE BEEN TERMINATED: ${exitHash}`) {
             bot.chat(`Ok ${name} :D`);
             process.exit(127);
         }
@@ -186,7 +187,7 @@ async function handleCommand(username, commandName, args, hash) {
                 }
                 break;
             case 'validate':
-                const inputHash = args.pop();
+                inputHash = args.pop();
                 if (hash == inputHash) {
                     bot.chat(`${inputHash} &2is a valid hash! :)`);
                     hash = generateRandomCode(12);
@@ -200,11 +201,10 @@ async function handleCommand(username, commandName, args, hash) {
         return hash;
     }
     else {
-        const inputHash = args.pop();
+        inputHash = args.pop();
         console.log(`[Debug] Input hash: ${inputHash}\n[Debug] Current hash: ${hash}`);
     }
-    const inputHash = args.pop();
-    if (inputHash === hash) {
+    if (inputHash == hash) {
         console.log(`[Debug] Command used: ${commandName}`);
         switch (commandName) {
             case 'commandspy':
@@ -289,6 +289,7 @@ async function handleCommand(username, commandName, args, hash) {
                 break;
             case 'cloop':
                 setInterval(() => runBackgroundTask("command_loop", botName, undefined, args[0], args.join(" ")), args[0]);
+                break;
             default:
                 bot.chat(`${commandName} isn't a command :()`);
         }
@@ -347,8 +348,6 @@ bot.once('spawn', onSpawn);
 async function runBackgroundTask(task, bot_name, player, ms, command) {
     if (!task)
         return;
-    if (!player)
-        return;
     if (!bot_name)
         return;
     if (task == "hardcore_ban") {
@@ -361,7 +360,6 @@ async function runBackgroundTask(task, bot_name, player, ms, command) {
         return;
     }
     if (task == "command_loop") {
-        console.log("It's running.");
         command?.replace(`${ms} `, "");
         bot.chat(`/${command}`);
         return;
@@ -371,7 +369,7 @@ async function runGreeting() {
     await sleep(2000);
     bot.chat("/extras:prefix &l&a[&#006400Bots&r&f&l&a]");
     await sleep(default_wait_time);
-    bot.chat(`&2Helloo!! I'm online and ready for work, owner and creator &3${owner}&2 :)`);
+    bot.chat(`&2Hello, &3${owner}&2! Ready for work, as I always am! :D`);
     await sleep(default_wait_time);
     bot.chat("/cspy on");
     await sleep(default_wait_time);
