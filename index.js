@@ -3,6 +3,7 @@ const mc = require('mineflayer');
 
 // Created with hard work, by @spyingcreeper09 :)
 // I only did the base of it. You debugged further then i even thought was possible with this bot lol. You have to take soem credit too
+// Fine then. @SonicandTailsCD (it's-a me!) did some work. But you came up with this idea :)
 
 // Bot setup constants
 const botName = 'Bot'; // Replace with a username to your liking for your bot
@@ -65,22 +66,20 @@ async function handleCommand(client, commandName, args) {
     // Check for different commands
     switch (commandName) {
         case 'countdown':
-            // Check if no arguments are provided
-            if (args.length == 0) {
-                // Inform user of incorrect command usage
-                client.chat('Invalid arguments for this command. Usage: !countdown [message to output] (Counts down from 3)'); // Later on, I will introduce an option to choose how many seconds the bot counts to
-            } 
-            else {
-                // count down from 3
-                client.chat('3');
-                await sleep(100); // Delay to prevent rapid chat commands
-                client.chat('2');
-                await sleep(100); // Delay in milliseconds
-                client.chat('1');
-                await sleep(1000);
-                client.chat(args.join(" "));
+            // Upgraded countdown mechanics
+            // if (args.length > 1 &&  /^[0-9]+$/.test(args[1])) { // Check- actually, wait - this may not be so beginner-friendly...
+            if (args.length > 1) {
+                const value = number(args[0]);
+                if (value === 0) {
+                    client.chat("Sorry, the first parameter must be a number, and it must be greater than 0.");
+                }
+                for (let count = value; count >= 1; count--) { // Count until it reaches 0
+                    client.chat(`${count}...`)
+                    await sleep(1000);
+                }
+                args.shift() // delete number from argument list
+                client.chat(args.join("") || "Countdown complete!");
             }
-            break;
         // Command to perform self-care actions in Minecraft
         case 'selfcare':
             // Check if no arguments are provided
@@ -110,7 +109,7 @@ async function handleCommand(client, commandName, args) {
         // Command to echo a message in Minecraft chat
         case 'echo':
             // Check if arguments are provided
-            if (args.length != 0) {
+            if (args.length !== 0) {
                 // Concatenate arguments into a single string and send it to chat
                 client.chat(args.join(" "));
             } else {
@@ -121,7 +120,7 @@ async function handleCommand(client, commandName, args) {
         // Add more cases for other commands here
         default:
             // Log unknown commands to console
-            client.chat(`${commandName} isn't a command :()`);
+            client.chat(`${commandName} isn't a command. :(`);
     }
 }
 
@@ -142,5 +141,43 @@ function generateRandomCode(length) {
     return code;
 }
 
+/**
+* Checks if a string contains only numbers
+* @param {string} str A string. Do not send anything else to this function.
+* @returns {number}
+*/
+function number(str) {
+    return parseInt(
+        str.split('\n')[0]?.trim()
+           ?.match(/^[0-9]+$/)?.[0]
+        || "0"
+    );
+    /*
+    Breakdown:
+    str.split('\n'): separates every line
+    [0]: grab the first line available
+    ?.trim(): if it exists, remove the accidental spaces
+    ?.match([regexp]): if still exists, try to find the numbers with the below syntax:
+        /: start of RegEx declaration (RegEx is basically the king of finding exact patterns in text)
+        ^: start of text
+        [0-9]: find numbers
+        +: repeat this search (so it finds multiple numbers, like 000000000...
+        $: until the text ends
+    ?.[0]: grab the first result
+    || 0; if it doesn't exist, give 0 to parseInt() instead
+    */
+}
+
+/**
+* Sleep.
+* @param {number} ms How many miliseconds to wait
+* @returns {void} nothing
+*/
+async function sleep(ms) {
+    await new Promise(resolve => setTimeout(resolve, ms));
+    return;
+}
+
 // Event listener for successful login
 client.once('spawn', onSpawn);
+
